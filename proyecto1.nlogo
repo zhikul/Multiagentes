@@ -100,7 +100,7 @@ to normalbehavior
   lt random-float 40
   fd human-speed / 100
   if count zombies > 0 [
-  set zombie-near one-of zombies in-radius vision
+  set zombie-near one-of zombies in-radius 200
   if (distance zombie-near < vision)[
     let zombie-on-sight zombie-near
     ask lidernormales [
@@ -118,7 +118,7 @@ to normalbehavior
   ]
   ask normales [
     if count zombies > 0 [
-    set zombie-near one-of zombies in-radius vision
+    set zombie-near one-of zombies in-radius 200
     if (distance zombie-near < vision)[
       let zombie-on-sight zombie-near
       ask lidernormales [
@@ -157,7 +157,7 @@ to zombiebehavior
   if any? other turtles-here
     [convert]
   if(count normales + count lidernormales > 0)[
-    set human-near min-one-of turtles with [breed = normales or breed = lidernormales] [in-radius 200]
+    set human-near one-of turtles with [breed = normales or breed = lidernormales] in-radius 200
   if (distance human-near < 20)[
     face human-near
     create-zombie-link-with human-near
@@ -305,7 +305,7 @@ human-speed
 human-speed
 1
 100
-60.0
+11.0
 1
 1
 NIL
@@ -320,7 +320,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-10.0
+2.0
 1
 1
 NIL
@@ -335,7 +335,7 @@ zombie-speed
 zombie-speed
 0
 100
-25.0
+8.0
 1
 1
 NIL
@@ -350,7 +350,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-25.0
+4.0
 1
 1
 NIL
@@ -376,7 +376,7 @@ densidad-balas
 densidad-balas
 0
 100
-15.0
+17.0
 1
 1
 NIL
