@@ -206,7 +206,7 @@ to shoot
       set distancia 10
       create-bala-link-with myself
     ]
-    set reload 45
+    set reload reloa
     set municion municion - 1
 
   ]
@@ -403,6 +403,21 @@ vision
 0
 100
 20.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+9
+334
+181
+367
+reloa
+reloa
+0
+100
+0.0
 1
 1
 NIL
