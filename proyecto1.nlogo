@@ -1,12 +1,10 @@
 breed [normales normal]
 breed [hostiles hostil]
 breed [zombies zombie]
-breed [lidernormales lidernormal]
 breed [balas bala]
-;globals[shooter]
+globals[minimun-separation max-align-turn]
 turtles-own[xc yc dist human-near zombie-near speed]
-normales-own [municion shooter]
-lidernormales-own [municion shooter reload]
+normales-own [municion shooter reload compas nearest-compa]
 zombies-own []
 balas-own[distancia]
 
@@ -18,8 +16,8 @@ undirected-link-breed [zombie-links zombie-link]
 
 to setup
   ca
-
-
+  set minimun-separation 1
+  set max-align-turn 5
   ask patches [set pcolor white]
   setup-normals
   setup-zombies
@@ -43,25 +41,15 @@ end
 
 to setup-normals
 set-default-shape normales "person"
-  set-default-shape lidernormales "person"
   create-normales cantidad-normales[
     setxy random-xcor random-ycor
     set color blue
     set size 1
-
+    set compas no-turtles
   ]
-  create-lidernormales 1 [
-    setxy random-xcor random-ycor
-    set color blue
-    set municion 20
-    set size 2
-    create-blue-links-to other normales
-    [tie]
 
-]
 
   ;layout-spring normales blue-links 0.5 0.5 0.1
-  ask normales [ layout-tutte (lidernormales with [ count my-links > 1 ] ) blue-links 3]
   ask blue-links [set color blue]
   ; ask personas  [
     ;face persona 1
@@ -79,49 +67,87 @@ to setup-municion
 end
 
 to go
-
-
-  ask lidernormales [
+  ask normales [
     normalbehavior
     pick-up-ammo
   ]
-  ask normales [pick-up-ammo]
   ;ask lidernormales [if ticks = 1 [set municion 10]]
 
   ask balas [balabehavior]
   ask zombies [zombiebehavior]
-  new-lider
   ifelse (showlinks? != true) [ ask links [hide-link] ][ ask links [show-link] ]
   tick
 end
+to-report avarege-normales-heading
+  let x-component sum [dx] of compas
+      let y-component sum [dy] of compas
+      ifelse x-component = 0 and y-component = 0
+      [report heading]
+      [report atan x-component y-component]
+end
+to-report avarege-heading-towards-compas
+  let x-component mean [sin (towards myself + 180)] of compas
+  let y-component mean [cos (towards myself + 180)] of compas
+    ifelse x-component = 0 and y-component = 0
+    [ report heading ]
+    [ report atan x-component y-component ]
+
+end
 
 to normalbehavior
-  rt random-float 40
-  lt random-float 40
-  fd human-speed / 100
+  set compas other normales in-radius vision
+  if any? compas[
+    set nearest-compa min-one-of compas [distance myself]
+    ifelse (distance nearest-compa) < minimun-separation
+    [ ;;separate
+      ifelse abs subtract-headings heading [heading] of nearest-compa > max-align-turn
+      [ifelse subtract-headings heading [heading] of nearest-compa > 0
+        [rt max-align-turn]
+        [lt max-align-turn]
+      ]
+      [rt [heading] of nearest-compa]
+    ]
+    [;;align & cohere
+
+      ifelse abs subtract-headings avarege-normales-heading heading  > max-align-turn
+      [ifelse subtract-headings avarege-normales-heading heading > 0
+        [rt max-align-turn]
+        [lt max-align-turn]
+      ]
+      [rt subtract-headings avarege-normales-heading heading]
+
+      ifelse abs subtract-headings avarege-heading-towards-compas heading > max-align-turn
+      [ifelse subtract-headings avarege-heading-towards-compas heading > 0
+        [rt max-align-turn]
+        [lt max-align-turn]
+      ]
+      [rt subtract-headings avarege-heading-towards-compas heading]
+    ]
+  ]
   if count zombies > 0 [
-  set zombie-near one-of zombies in-radius 200
-  if (distance zombie-near < vision)[
-    let zombie-on-sight zombie-near
-    ask lidernormales [
+    set zombie-near min-one-of zombies[distance myself]
+    if (distance zombie-near < vision)[
+      let zombie-on-sight zombie-near
       face zombie-on-sight
       shoot
       rt 180
       lt random 90
       rt random 90
-       if reload > 0 [
-           set reload reload - 1
-          ]
+      if reload > 0 [
+        set reload reload - 1
+      ]
       ;set human-speed (human-speed * 1.1)
     ]
+    rt random-float 40
+    lt random-float 40
+    fd human-speed / 100
   ]
-  ]
+
   ask normales [
     if count zombies > 0 [
     set zombie-near one-of zombies in-radius 200
     if (distance zombie-near < vision)[
       let zombie-on-sight zombie-near
-      ask lidernormales [
           face zombie-on-sight
           shoot
           rt 180
@@ -131,20 +157,8 @@ to normalbehavior
            set reload reload - 1
           ]
         ;set human-speed (human-speed * 1.1)
-      ]
     ]
   ]
-  ]
-end
-
-to new-lider
-  if (count lidernormales = 0 and count normales > 0)[
-    ask one-of normales [
-      set breed lidernormales
-      set size 2
-      create-blue-links-to other normales [tie]
-    ]
-
   ]
 end
 
@@ -156,8 +170,8 @@ to zombiebehavior
   if (count my-links > 0)[ask my-links [die]]
   if any? other turtles-here
     [convert]
-  if(count normales + count lidernormales > 0)[
-    set human-near one-of turtles with [breed = normales or breed = lidernormales] in-radius 200
+  if(count normales > 0)[
+    set human-near one-of turtles with [breed = normales] in-radius 200
   if (distance human-near < 20)[
     face human-near
     create-zombie-link-with human-near
@@ -170,16 +184,11 @@ to convert
     set breed zombies
     set color red
   ]
-  ask lidernormales-on patch-here [
-    set breed zombies
-    set size 1
-    set color red
-  ]
 
 end
 
 to pick-up-ammo
-  ask patch-here [if pcolor = lime + 2 [ask lidernormales [set municion municion  + 1 ] set pcolor white ] ]
+  ask patch-here [if pcolor = lime + 2 [ask turtles-here [set municion municion  + 1 ] set pcolor white ] ]
 
 end
 
@@ -320,7 +329,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-2.0
+27.0
 1
 1
 NIL
@@ -350,7 +359,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-4.0
+0.0
 1
 1
 NIL
@@ -381,17 +390,6 @@ densidad-balas
 1
 NIL
 HORIZONTAL
-
-MONITOR
-5
-181
-339
-226
-municion lidernormales
-[municion] of lidernormales
-17
-1
-11
 
 SLIDER
 171
