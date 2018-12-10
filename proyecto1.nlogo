@@ -95,6 +95,7 @@ to-report avarege-heading-towards-compas
 end
 
 to normalbehavior
+  ;;floacking
   set compas other normales in-radius vision
   if any? compas[
     set nearest-compa min-one-of compas [distance myself]
@@ -125,9 +126,9 @@ to normalbehavior
     ]
   ]
   if count zombies > 0 [
-    set zombie-near min-one-of zombies[distance myself]
-    if (distance zombie-near < vision)[
-      let zombie-on-sight zombie-near
+    set zombie-near zombies in-radius vision
+    if any? zombie-near[
+      let zombie-on-sight min-one-of zombie-near [distance myself]
       face zombie-on-sight
       shoot
       rt 180
@@ -136,47 +137,53 @@ to normalbehavior
       if reload > 0 [
         set reload reload - 1
       ]
-      ;set human-speed (human-speed * 1.1)
     ]
+      ;set human-speed (human-speed * 1.1)
     rt random-float 40
     lt random-float 40
     fd human-speed / 100
+
   ]
 
-  ask normales [
-    if count zombies > 0 [
-    set zombie-near one-of zombies in-radius 200
-    if (distance zombie-near < vision)[
-      let zombie-on-sight zombie-near
-          face zombie-on-sight
-          shoot
-          rt 180
-          lt random 90
-          rt random 90
-          if reload > 0 [
-           set reload reload - 1
-          ]
+;  ask normales [
+;    if count zombies > 0 [
+;    set zombie-near zombies in-radius vision
+;    if any? zombie-near[
+;      let zombie-on-sight one-of zombie-near
+ ;         face zombie-on-sight
+;          shoot
+ ;         rt 180
+;          lt random 90
+;          rt random 90
+ ;         if reload > 0 [
+ ;          set reload reload - 1
+ ;         ]
         ;set human-speed (human-speed * 1.1)
-    ]
-  ]
-  ]
+
+  ;    ]
+ ; ]
+ ; ]
 end
 
 
 to zombiebehavior
-  rt random-float 40
-  lt random-float 40
-  fd (zombie-speed / 100)
+
   if (count my-links > 0)[ask my-links [die]]
   if any? other turtles-here
     [convert]
   if(count normales > 0)[
-    set human-near one-of turtles with [breed = normales] in-radius 200
-  if (distance human-near < 20)[
-    face human-near
-    create-zombie-link-with human-near
+    set human-near turtles with [breed = normales] in-radius vision
+    ifelse any? human-near [
+      let human-on-sight min-one-of human-near [distance myself]
+    face human-on-sight
+    create-zombie-link-with human-on-sight
     fd (zombie-speed / 100)
+
   ]
+    [
+      rt random-float 40
+      lt random-float 40
+      fd (zombie-speed / 100)]
   ]
 end
 to convert
@@ -290,7 +297,7 @@ SWITCH
 315
 showlinks?
 showlinks?
-1
+0
 1
 -1000
 
@@ -314,7 +321,7 @@ human-speed
 human-speed
 1
 100
-11.0
+20.0
 1
 1
 NIL
@@ -329,7 +336,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-27.0
+11.0
 1
 1
 NIL
@@ -344,7 +351,7 @@ zombie-speed
 zombie-speed
 0
 100
-8.0
+22.0
 1
 1
 NIL
@@ -359,7 +366,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-0.0
+14.0
 1
 1
 NIL
@@ -385,7 +392,7 @@ densidad-balas
 densidad-balas
 0
 100
-17.0
+12.0
 1
 1
 NIL
@@ -415,7 +422,7 @@ reloa
 reloa
 0
 100
-0.0
+27.0
 1
 1
 NIL
