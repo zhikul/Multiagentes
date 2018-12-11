@@ -142,8 +142,6 @@ to normalbehavior
 
 
   ]
-  rt random-float 40
-    lt random-float 40
     fd human-speed / 100
 ;  ask normales [
 ;    if count zombies > 0 [
@@ -366,7 +364,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-0.0
+6.0
 1
 1
 NIL
