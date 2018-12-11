@@ -106,7 +106,7 @@ to normalbehavior
         [rt max-align-turn]
         [lt max-align-turn]
       ]
-      [rt [heading] of nearest-compa]
+      [rt subtract-headings heading [heading] of nearest-compa]
     ]
     [;;align & cohere
 
@@ -116,7 +116,7 @@ to normalbehavior
         [lt max-align-turn]
       ]
       [rt subtract-headings avarege-normales-heading heading]
-
+      ;;cohere
       ifelse abs subtract-headings avarege-heading-towards-compas heading > max-align-turn
       [ifelse subtract-headings avarege-heading-towards-compas heading > 0
         [rt max-align-turn]
@@ -132,19 +132,19 @@ to normalbehavior
       face zombie-on-sight
       shoot
       rt 180
-      lt random 90
-      rt random 90
+      ;lt random 90
+      ;rt random 90
       if reload > 0 [
         set reload reload - 1
       ]
     ]
       ;set human-speed (human-speed * 1.1)
-    rt random-float 40
-    lt random-float 40
-    fd human-speed / 100
+
 
   ]
-
+  rt random-float 40
+    lt random-float 40
+    fd human-speed / 100
 ;  ask normales [
 ;    if count zombies > 0 [
 ;    set zombie-near zombies in-radius vision
@@ -195,7 +195,7 @@ to convert
 end
 
 to pick-up-ammo
-  ask patch-here [if pcolor = lime + 2 [ask turtles-here [set municion municion  + 1 ] set pcolor white ] ]
+  ask patch-here [if pcolor = lime + 2 [ask normales-here [set municion municion  + 1 ] set pcolor white ] ]
 
 end
 
@@ -351,7 +351,7 @@ zombie-speed
 zombie-speed
 0
 100
-22.0
+20.0
 1
 1
 NIL
@@ -366,7 +366,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-14.0
+0.0
 1
 1
 NIL
@@ -407,22 +407,22 @@ vision
 vision
 0
 100
-20.0
+29.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-9
-334
-181
-367
+4
+316
+176
+349
 reloa
 reloa
 0
 100
-27.0
+59.0
 1
 1
 NIL
