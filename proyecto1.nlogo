@@ -101,26 +101,26 @@ to normalbehavior
     set nearest-compa min-one-of compas [distance myself]
     ifelse (distance nearest-compa) < minimun-separation
     [ ;;separate
-      ifelse abs subtract-headings heading [heading] of nearest-compa > max-align-turn
+      ifelse abs subtract-headings heading [heading] of nearest-compa > 2
       [ifelse subtract-headings heading [heading] of nearest-compa > 0
-        [rt max-align-turn]
-        [lt max-align-turn]
+        [rt 2]
+        [lt 2]
       ]
       [rt subtract-headings heading [heading] of nearest-compa]
     ]
     [;;align & cohere
 
-      ifelse abs subtract-headings avarege-normales-heading heading  > max-align-turn
+      ifelse abs subtract-headings avarege-normales-heading heading  > 5
       [ifelse subtract-headings avarege-normales-heading heading > 0
-        [rt max-align-turn]
-        [lt max-align-turn]
+        [rt 5]
+        [lt 5]
       ]
       [rt subtract-headings avarege-normales-heading heading]
       ;;cohere
-      ifelse abs subtract-headings avarege-heading-towards-compas heading > max-align-turn
+      ifelse abs subtract-headings avarege-heading-towards-compas heading > 3
       [ifelse subtract-headings avarege-heading-towards-compas heading > 0
-        [rt max-align-turn]
-        [lt max-align-turn]
+        [rt 3]
+        [lt 3]
       ]
       [rt subtract-headings avarege-heading-towards-compas heading]
     ]
@@ -334,7 +334,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-11.0
+34.0
 1
 1
 NIL
@@ -349,7 +349,7 @@ zombie-speed
 zombie-speed
 0
 100
-20.0
+21.0
 1
 1
 NIL
@@ -364,7 +364,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-6.0
+78.0
 1
 1
 NIL
@@ -405,7 +405,7 @@ vision
 vision
 0
 100
-29.0
+20.0
 1
 1
 NIL
@@ -420,7 +420,7 @@ reloa
 reloa
 0
 100
-59.0
+41.0
 1
 1
 NIL
