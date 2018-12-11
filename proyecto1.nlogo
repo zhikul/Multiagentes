@@ -4,11 +4,11 @@ breed [zombies zombie]
 breed [balas bala]
 globals[minimun-separation max-align-turn]
 turtles-own[xc yc dist human-near zombie-near speed]
-normales-own [municion shooter reload compas nearest-compa]
+normales-own [municion shooter reload compas nearest-compa wounded]
+hostiles-own [municion reload compas nearest-compa]
 zombies-own []
-balas-own[distancia]
+balas-own[distancia breedd]
 
-directed-link-breed [blue-links blue-link]
 undirected-link-breed [bala-links bala-link]
 undirected-link-breed [zombie-links zombie-link]
 
@@ -16,12 +16,13 @@ undirected-link-breed [zombie-links zombie-link]
 
 to setup
   ca
-  set minimun-separation 1
-  set max-align-turn 5
+  set minimun-separation 0.5
+  set max-align-turn 3
   ask patches [set pcolor white]
   setup-normals
   setup-zombies
   setup-municion
+  setup-hostiles
   ifelse (showlinks? != true) [ ask links [hide-link] ][ ask links [show-link] ]
   reset-ticks
 
@@ -46,14 +47,26 @@ set-default-shape normales "person"
     set color blue
     set size 1
     set compas no-turtles
+    set wounded false
   ]
 
 
   ;layout-spring normales blue-links 0.5 0.5 0.1
-  ask blue-links [set color blue]
+
   ; ask personas  [
     ;face persona 1
     ;create-links-with other personas]
+end
+
+to setup-hostiles
+set-default-shape hostiles "person"
+  create-hostiles cantidad-hostiles[
+    setxy random-xcor random-ycor
+    set color black
+    set size 1
+    set compas no-turtles
+  ]
+
 end
 
 to setup-municion
@@ -72,6 +85,8 @@ to go
     pick-up-ammo
   ]
   ;ask lidernormales [if ticks = 1 [set municion 10]]
+
+  ask hostiles [hostiles-behavior pick-up-ammo]
 
   ask balas [balabehavior]
   ask zombies [zombiebehavior]
@@ -96,7 +111,7 @@ end
 
 to normalbehavior
   ;;floacking
-  set compas other normales in-radius vision
+  set compas other normales in-radius 5
   if any? compas[
     set nearest-compa min-one-of compas [distance myself]
     ifelse (distance nearest-compa) < minimun-separation
@@ -138,29 +153,58 @@ to normalbehavior
         set reload reload - 1
       ]
     ]
-      ;set human-speed (human-speed * 1.1)
-
 
   ]
     fd human-speed / 100
-;  ask normales [
-;    if count zombies > 0 [
-;    set zombie-near zombies in-radius vision
-;    if any? zombie-near[
-;      let zombie-on-sight one-of zombie-near
- ;         face zombie-on-sight
-;          shoot
- ;         rt 180
-;          lt random 90
-;          rt random 90
- ;         if reload > 0 [
- ;          set reload reload - 1
- ;         ]
-        ;set human-speed (human-speed * 1.1)
 
-  ;    ]
- ; ]
- ; ]
+end
+
+to hostiles-behavior
+  ;;flocking
+  set compas other hostiles in-radius vision
+  if any? compas[
+    set nearest-compa min-one-of compas [distance myself]
+    ifelse (distance nearest-compa) < minimun-separation
+    [ ;;separate
+      ifelse abs subtract-headings heading [heading] of nearest-compa > 2
+      [ifelse subtract-headings heading [heading] of nearest-compa > 0
+        [rt 2]
+        [lt 2]
+      ]
+      [rt subtract-headings heading [heading] of nearest-compa]
+    ]
+    [;;align & cohere
+
+      ifelse abs subtract-headings avarege-normales-heading heading  > 5
+      [ifelse subtract-headings avarege-normales-heading heading > 0
+        [rt 5]
+        [lt 5]
+      ]
+      [rt subtract-headings avarege-normales-heading heading]
+      ;;cohere
+      ifelse abs subtract-headings avarege-heading-towards-compas heading > 3
+      [ifelse subtract-headings avarege-heading-towards-compas heading > 0
+        [rt 3]
+        [lt 3]
+      ]
+      [rt subtract-headings avarege-heading-towards-compas heading]
+    ]
+  ]
+  ifelse count zombies > 0 or count normales > 0 [
+    set zombie-near turtles with [breed = zombies or breed = normales] in-radius vision
+    ifelse any? zombie-near[
+      let zombie-on-sight min-one-of zombie-near [distance myself]
+      face zombie-on-sight
+      shoot
+      if reload > 0 [
+        set reload reload - 1
+      ]
+    ]
+[ fd human-speed / 100]
+
+  ]
+  [ fd human-speed / 100]
+
 end
 
 
@@ -193,7 +237,7 @@ to convert
 end
 
 to pick-up-ammo
-  ask patch-here [if pcolor = lime + 2 [ask normales-here [set municion municion  + 1 ] set pcolor white ] ]
+    ask patch-here [if pcolor = lime + 2 [ask one-of turtles with [breed = normales or breed = hostiles] [set municion municion  + 1 ] set pcolor white ] ]
 
 end
 
@@ -201,19 +245,47 @@ to balabehavior
   if distancia > 0[
     set heading heading fd 3
     if (any? turtles-here with [breed = zombies]) [kill]
+    if breedd = hostiles[
+      if (any? turtles-here with [breed = normales]) [
+        if any? turtles-here with [breed = normales and wounded = true][
+        ask one-of normales-here with [wounded = true][
+          show "hola"
+          kill
+        ]
+        ]
+        if any? turtles-here with [breed = normales and wounded = false][
+        ask one-of turtles-here with [breed = normales]
+          [
+            set wounded true
+            show wounded
+            ask myself [die]
+        ]
+        ]
+      ]
+    ]
   ]
   set distancia distancia - 1
   if distancia = 0 [die]
 end
 
 to kill
-  ask zombies-on patch-here [die]
+  ask one-of turtles-on patch-here [
+    if breed = normales and municion > 0 [
+    ask patch-here[
+    set pcolor lime + 2
+    ]
+    ]
+    die
+
+  ]
   ;ask normales-on patch-here[]
   die
 end
 to shoot
   if (municion > 0 and reload <= 0) [
+
     hatch-balas 1 [
+      set breedd [breed] of myself
       set size 1
       set color red
       setxy xcor ycor
@@ -334,7 +406,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-34.0
+30.0
 1
 1
 NIL
@@ -349,7 +421,7 @@ zombie-speed
 zombie-speed
 0
 100
-21.0
+25.0
 1
 1
 NIL
@@ -364,7 +436,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-78.0
+0.0
 1
 1
 NIL
@@ -405,7 +477,7 @@ vision
 vision
 0
 100
-20.0
+10.0
 1
 1
 NIL
@@ -420,11 +492,37 @@ reloa
 reloa
 0
 100
-41.0
+22.0
 1
 1
 NIL
 HORIZONTAL
+
+SLIDER
+16
+190
+188
+223
+cantidad-hostiles
+cantidad-hostiles
+0
+100
+25.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+39
+387
+128
+432
+NIL
+count hostiles
+17
+1
+11
 
 @#$#@#$#@
 ## WHAT IS IT?
