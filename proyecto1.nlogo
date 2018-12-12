@@ -21,8 +21,10 @@ to setup
   ask patches [set pcolor white]
   setup-normals
   setup-zombies
-  setup-municion
+  ;setup-municion
   setup-hostiles
+  ;setup-medkits
+  setup-items
   ifelse (showlinks? != true) [ ask links [hide-link] ][ ask links [show-link] ]
   reset-ticks
 
@@ -79,14 +81,37 @@ to setup-municion
   ;set color red
 end
 
+to setup-medkits
+  ask patches [
+    if random 100 < densidad-medkits
+    [set pcolor yellow]
+  ]
+end
+to setup-items
+  ask patches [
+    if random 100 < densidad-balas
+    [set pcolor lime + 2]
+    if random 100 < densidad-medkits
+    [
+      ifelse pcolor = white [
+        set pcolor yellow
+      ]
+      [set pcolor magenta + 3]
+    ]
+  ]
+
+
+end
 to go
   ask normales [
     normalbehavior
-    pick-up-ammo
+    pick-up-items
+    ;pick-up-ammo
+    ;pick-up-medkit
   ]
   ;ask lidernormales [if ticks = 1 [set municion 10]]
 
-  ask hostiles [hostiles-behavior pick-up-ammo]
+  ask hostiles [hostiles-behavior pick-up-items]
 
   ask balas [balabehavior]
   ask zombies [zombiebehavior]
@@ -155,7 +180,12 @@ to normalbehavior
     ]
 
   ]
+  ifelse wounded = false [
     fd human-speed / 100
+  ]
+  [
+    fd (human-speed / 100) * (2 / 3)
+  ]
 
 end
 
@@ -190,12 +220,13 @@ to hostiles-behavior
       [rt subtract-headings avarege-heading-towards-compas heading]
     ]
   ]
-  ifelse count zombies > 0 or count normales > 0 [
+  ifelse count zombies > 0 or count normales > 0 and municion > 0 [
     set zombie-near turtles with [breed = zombies or breed = normales] in-radius vision
     ifelse any? zombie-near[
       let zombie-on-sight min-one-of zombie-near [distance myself]
       face zombie-on-sight
       shoot
+      fd human-speed / 200
       if reload > 0 [
         set reload reload - 1
       ]
@@ -213,8 +244,8 @@ to zombiebehavior
   if (count my-links > 0)[ask my-links [die]]
   if any? other turtles-here
     [convert]
-  if(count normales > 0)[
-    set human-near turtles with [breed = normales] in-radius vision
+  ifelse(count normales + count hostiles > 0)[
+    set human-near turtles with [breed = normales or breed = hostiles] in-radius vision
     ifelse any? human-near [
       let human-on-sight min-one-of human-near [distance myself]
     face human-on-sight
@@ -227,9 +258,19 @@ to zombiebehavior
       lt random-float 40
       fd (zombie-speed / 100)]
   ]
+  [
+    rt random-float 40
+    lt random-float 40
+    fd (zombie-speed / 100)
+  ]
+
 end
 to convert
   ask normales-on patch-here [
+    set breed zombies
+    set color red
+  ]
+  ask hostiles-on patch-here[
     set breed zombies
     set color red
   ]
@@ -240,6 +281,62 @@ to pick-up-ammo
     ask patch-here [if pcolor = lime + 2 [ask one-of turtles with [breed = normales or breed = hostiles] [set municion municion  + 1 ] set pcolor white ] ]
 
 end
+
+to pick-up-medkit
+  ask patch-here [if pcolor = yellow [ask normales with [ wounded = true] [set wounded false] set pcolor white ] ]
+
+end
+to pick-up-items
+  ask patch-here [
+    if pcolor = lime + 2 [ask one-of turtles with [breed = normales or breed = hostiles] [
+      if municion < max-ammo
+      [
+        set municion municion  + 1
+        ask patch-here [set pcolor white]
+      ]
+      ]
+    ]
+    if pcolor = yellow [
+      if any? normales-here with [wounded = true][
+        ask one-of normales-here with [ wounded = true] [
+          set wounded false
+        ]
+        set pcolor white
+      ]
+    ]
+    if pcolor = magenta + 3 [
+      if any? normales-here[
+        ask one-of normales-here [
+          ifelse wounded = false
+          [
+            if municion < max-ammo
+            [
+              set municion municion  + 1
+              ask patch-here [set pcolor yellow]
+            ]
+          ]
+          [
+            ifelse municion < max-ammo[
+            set wounded false
+            set municion municion + 1
+            ask patch-here [set pcolor white]
+            ]
+            [set pcolor lime + 2]
+          ]
+      ]
+
+      ]
+     if any? hostiles-here
+      [
+       ask one-of hostiles-here [
+         set municion municion + 1
+        ]
+        set pcolor yellow
+      ]
+    ]
+  ]
+end
+
 
 to balabehavior
   if distancia > 0[
@@ -406,7 +503,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-30.0
+44.0
 1
 1
 NIL
@@ -421,7 +518,7 @@ zombie-speed
 zombie-speed
 0
 100
-25.0
+22.0
 1
 1
 NIL
@@ -436,7 +533,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-0.0
+38.0
 1
 1
 NIL
@@ -462,7 +559,7 @@ densidad-balas
 densidad-balas
 0
 100
-12.0
+45.0
 1
 1
 NIL
@@ -492,22 +589,22 @@ reloa
 reloa
 0
 100
-22.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-16
-190
-188
-223
+8
+187
+180
+220
 cantidad-hostiles
 cantidad-hostiles
 0
 100
-25.0
+5.0
 1
 1
 NIL
@@ -523,6 +620,36 @@ count hostiles
 17
 1
 11
+
+SLIDER
+181
+185
+353
+218
+densidad-medkits
+densidad-medkits
+0
+100
+41.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+49
+518
+221
+551
+max-ammo
+max-ammo
+0
+100
+20.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
