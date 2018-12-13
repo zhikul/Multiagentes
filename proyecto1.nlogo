@@ -71,22 +71,6 @@ set-default-shape hostiles "person"
 
 end
 
-to setup-municion
- ; set-default-shape balas "deafult"
-  ask patches [
-    if random 100 < densidad-balas
-    [set pcolor lime + 2]
-  ]
-  ;set size 0.5
-  ;set color red
-end
-
-to setup-medkits
-  ask patches [
-    if random 100 < densidad-medkits
-    [set pcolor yellow]
-  ]
-end
 to setup-items
   ask patches [
     if random 100 < densidad-balas
@@ -106,13 +90,8 @@ to go
   ask normales [
     normalbehavior
     pick-up-items
-    ;pick-up-ammo
-    ;pick-up-medkit
   ]
-  ;ask lidernormales [if ticks = 1 [set municion 10]]
-
   ask hostiles [hostiles-behavior pick-up-items]
-
   ask balas [balabehavior]
   ask zombies [zombiebehavior]
   ifelse (showlinks? != true) [ ask links [hide-link] ][ ask links [show-link] ]
@@ -277,15 +256,6 @@ to convert
 
 end
 
-to pick-up-ammo
-    ask patch-here [if pcolor = lime + 2 [ask one-of turtles with [breed = normales or breed = hostiles] [set municion municion  + 1 ] set pcolor white ] ]
-
-end
-
-to pick-up-medkit
-  ask patch-here [if pcolor = yellow [ask normales with [ wounded = true] [set wounded false] set pcolor white ] ]
-
-end
 to pick-up-items
   ask patch-here [
     if pcolor = lime + 2 [ask one-of turtles with [breed = normales or breed = hostiles] [
@@ -464,7 +434,7 @@ SWITCH
 315
 showlinks?
 showlinks?
-0
+1
 1
 -1000
 
@@ -488,7 +458,7 @@ human-speed
 human-speed
 1
 100
-20.0
+10.0
 1
 1
 NIL
@@ -503,7 +473,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-44.0
+30.0
 1
 1
 NIL
@@ -518,7 +488,7 @@ zombie-speed
 zombie-speed
 0
 100
-22.0
+20.0
 1
 1
 NIL
@@ -559,7 +529,7 @@ densidad-balas
 densidad-balas
 0
 100
-45.0
+25.0
 1
 1
 NIL
@@ -589,7 +559,7 @@ reloa
 reloa
 0
 100
-10.0
+5.0
 1
 1
 NIL
@@ -604,7 +574,7 @@ cantidad-hostiles
 cantidad-hostiles
 0
 100
-5.0
+30.0
 1
 1
 NIL
@@ -630,7 +600,7 @@ densidad-medkits
 densidad-medkits
 0
 100
-41.0
+10.0
 1
 1
 NIL
