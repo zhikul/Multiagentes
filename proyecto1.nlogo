@@ -485,7 +485,7 @@ human-speed
 human-speed
 1
 100
-14.0
+10.0
 1
 1
 NIL
@@ -500,7 +500,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-60.0
+40.0
 1
 1
 NIL
@@ -515,7 +515,7 @@ zombie-speed
 zombie-speed
 0
 100
-16.0
+15.0
 1
 1
 NIL
@@ -530,7 +530,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-77.0
+50.0
 1
 1
 NIL
@@ -556,7 +556,7 @@ densidad-balas
 densidad-balas
 0
 100
-30.0
+10.0
 1
 1
 NIL
@@ -586,7 +586,7 @@ reloa
 reloa
 0
 100
-10.0
+5.0
 1
 1
 NIL
@@ -601,7 +601,7 @@ cantidad-hostiles
 cantidad-hostiles
 0
 100
-26.0
+20.0
 1
 1
 NIL
@@ -627,7 +627,7 @@ densidad-medkits
 densidad-medkits
 0
 100
-18.0
+5.0
 1
 1
 NIL
@@ -642,7 +642,7 @@ max-ammo
 max-ammo
 0
 100
-10.0
+7.0
 1
 1
 NIL
@@ -657,7 +657,7 @@ prob-reproduccion
 prob-reproduccion
 0
 100
-5.0
+10.0
 1
 1
 NIL
@@ -672,7 +672,7 @@ max-energia
 max-energia
 200
 500
-500.0
+300.0
 1
 1
 NIL
@@ -1033,18 +1033,60 @@ NetLogo 6.0.4
     <metric>count normales</metric>
     <metric>count hostiles</metric>
     <metric>count zombies</metric>
-    <steppedValueSet variable="max-energia" first="300" step="50" last="500"/>
-    <steppedValueSet variable="densidad-balas" first="10" step="2" last="30"/>
-    <steppedValueSet variable="cantidad-hostiles" first="0" step="10" last="100"/>
-    <steppedValueSet variable="cantidad-zombies" first="50" step="10" last="100"/>
-    <steppedValueSet variable="zombie-speed" first="15" step="2" last="31"/>
-    <steppedValueSet variable="reloa" first="5" step="1" last="10"/>
-    <steppedValueSet variable="cantidad-normales" first="40" step="10" last="100"/>
-    <steppedValueSet variable="vision" first="5" step="1" last="15"/>
-    <steppedValueSet variable="max-ammo" first="7" step="2" last="15"/>
-    <steppedValueSet variable="human-speed" first="7" step="2" last="15"/>
-    <steppedValueSet variable="densidad-medkits" first="5" step="2" last="15"/>
-    <steppedValueSet variable="prob-reproduccion" first="1" step="1" last="5"/>
+    <enumeratedValueSet variable="max-energia">
+      <value value="300"/>
+      <value value="400"/>
+      <value value="500"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="densidad-balas">
+      <value value="10"/>
+      <value value="20"/>
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cantidad-hostiles">
+      <value value="20"/>
+      <value value="40"/>
+      <value value="60"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cantidad-zombies">
+      <value value="50"/>
+      <value value="75"/>
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="zombie-speed">
+      <value value="15"/>
+      <value value="25"/>
+      <value value="30"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="reloa">
+      <value value="5"/>
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="cantidad-normales">
+      <value value="40"/>
+      <value value="80"/>
+      <value value="100"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="vision">
+      <value value="5"/>
+      <value value="10"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="max-ammo">
+      <value value="7"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="human-speed">
+      <value value="10"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="densidad-medkits">
+      <value value="5"/>
+      <value value="15"/>
+    </enumeratedValueSet>
+    <enumeratedValueSet variable="prob-reproduccion">
+      <value value="5"/>
+      <value value="10"/>
+    </enumeratedValueSet>
   </experiment>
 </experiments>
 @#$#@#$#@
