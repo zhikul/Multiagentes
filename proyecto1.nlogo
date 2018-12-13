@@ -4,8 +4,8 @@ breed [zombies zombie]
 breed [balas bala]
 globals[minimun-separation max-align-turn]
 turtles-own[xc yc dist human-near zombie-near speed]
-normales-own [municion shooter reload compas nearest-compa wounded]
-hostiles-own [municion reload compas nearest-compa]
+normales-own [municion shooter reload compas nearest-compa wounded energia]
+hostiles-own [municion reload compas nearest-compa energia]
 zombies-own []
 balas-own[distancia breedd]
 
@@ -50,6 +50,7 @@ set-default-shape normales "person"
     set size 1
     set compas no-turtles
     set wounded false
+    set energia 300
   ]
 
 
@@ -67,6 +68,7 @@ set-default-shape hostiles "person"
     set color black
     set size 1
     set compas no-turtles
+    set energia 300
   ]
 
 end
@@ -88,8 +90,10 @@ to setup-items
 end
 to go
   ask normales [
+
     normalbehavior
     pick-up-items
+
   ]
   ask hostiles [hostiles-behavior pick-up-items]
   ask balas [balabehavior]
@@ -150,7 +154,7 @@ to normalbehavior
       let zombie-on-sight min-one-of zombie-near [distance myself]
       face zombie-on-sight
       shoot
-      rt 180
+      lt 170 + random 20
       ;lt random 90
       ;rt random 90
       if reload > 0 [
@@ -165,7 +169,9 @@ to normalbehavior
   [
     fd (human-speed / 100) * (2 / 3)
   ]
-
+  reproduce
+  set energia energia - 1
+  if energia < 0 [die]
 end
 
 to hostiles-behavior
@@ -214,7 +220,9 @@ to hostiles-behavior
 
   ]
   [ fd human-speed / 100]
-
+  set energia energia - 1
+  if energia < 0 [die]
+  reproduce
 end
 
 
@@ -310,7 +318,8 @@ end
 
 to balabehavior
   if distancia > 0[
-    set heading heading fd 3
+    set heading heading
+    fd 1
     if (any? turtles-here with [breed = zombies]) [kill]
     if breedd = hostiles[
       if (any? turtles-here with [breed = normales]) [
@@ -365,6 +374,24 @@ to shoot
   ]
 
 end
+to reproduce
+  if any? other turtles-here with [breed = [breed] of myself] [
+    if energia < 200 and energia > 100
+    [
+      if random 100 < prob-reproduccion[
+        set energia energia - 50
+        hatch 1 [
+          set energia max-energia + random 100
+          rt random-float 360 fd 1
+          set municion 0
+          if breed = normales [set wounded false]
+          set compas no-turtles
+        ]
+      ]
+    ]
+  ]
+
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 348
@@ -395,9 +422,9 @@ ticks
 
 BUTTON
 4
-129
+330
 164
-172
+373
 NIL
 setup
 NIL
@@ -411,10 +438,10 @@ NIL
 1
 
 BUTTON
-171
-130
-341
-173
+166
+330
+334
+374
 NIL
 go
 T
@@ -428,10 +455,10 @@ NIL
 1
 
 SWITCH
-5
-282
-157
-315
+166
+283
+333
+316
 showlinks?
 showlinks?
 1
@@ -451,14 +478,14 @@ count normales
 
 SLIDER
 6
-51
+186
 163
-84
+219
 human-speed
 human-speed
 1
 100
-10.0
+14.0
 1
 1
 NIL
@@ -473,7 +500,7 @@ cantidad-normales
 cantidad-normales
 1
 100
-30.0
+60.0
 1
 1
 NIL
@@ -481,14 +508,14 @@ HORIZONTAL
 
 SLIDER
 171
-50
+185
 343
-83
+218
 zombie-speed
 zombie-speed
 0
 100
-20.0
+16.0
 1
 1
 NIL
@@ -503,7 +530,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-38.0
+0.0
 1
 1
 NIL
@@ -521,15 +548,15 @@ count zombies
 11
 
 SLIDER
-5
-92
-164
-125
+7
+80
+166
+113
 densidad-balas
 densidad-balas
 0
 100
-25.0
+0.0
 1
 1
 NIL
@@ -537,9 +564,9 @@ HORIZONTAL
 
 SLIDER
 171
-92
+45
 343
-125
+78
 vision
 vision
 0
@@ -551,12 +578,83 @@ NIL
 HORIZONTAL
 
 SLIDER
+6
+151
+166
+184
+reloa
+reloa
+0
+100
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+7
+44
+163
+77
+cantidad-hostiles
+cantidad-hostiles
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
 4
-316
-176
-349
-reloa
-reloa
+280
+159
+325
+NIL
+count hostiles
+17
+1
+11
+
+SLIDER
+171
+81
+343
+114
+densidad-medkits
+densidad-medkits
+0
+100
+27.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+6
+115
+166
+148
+max-ammo
+max-ammo
+0
+100
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+171
+152
+343
+185
+prob-reproduccion
+prob-reproduccion
 0
 100
 5.0
@@ -566,56 +664,15 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-187
-180
-220
-cantidad-hostiles
-cantidad-hostiles
-0
-100
-30.0
-1
-1
-NIL
-HORIZONTAL
-
-MONITOR
-39
-387
-128
-432
-NIL
-count hostiles
-17
-1
-11
-
-SLIDER
-181
-185
-353
-218
-densidad-medkits
-densidad-medkits
-0
-100
-10.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-49
-518
-221
-551
-max-ammo
-max-ammo
-0
-100
-20.0
+170
+115
+343
+148
+max-energia
+max-energia
+200
+500
+500.0
 1
 1
 NIL
@@ -967,6 +1024,29 @@ NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
+<experiments>
+  <experiment name="experiment-zombies" repetitions="2" runMetricsEveryStep="false">
+    <setup>setup</setup>
+    <go>go</go>
+    <timeLimit steps="10000"/>
+    <exitCondition>(count zombies + count hostiles = 0) or (count zombies + count normales = 0) or (count normales + count hostiles = 0)</exitCondition>
+    <metric>count normales</metric>
+    <metric>count hostiles</metric>
+    <metric>count zombies</metric>
+    <steppedValueSet variable="max-energia" first="300" step="50" last="500"/>
+    <steppedValueSet variable="densidad-balas" first="10" step="2" last="30"/>
+    <steppedValueSet variable="cantidad-hostiles" first="0" step="10" last="100"/>
+    <steppedValueSet variable="cantidad-zombies" first="50" step="10" last="100"/>
+    <steppedValueSet variable="zombie-speed" first="15" step="2" last="31"/>
+    <steppedValueSet variable="reloa" first="5" step="1" last="10"/>
+    <steppedValueSet variable="cantidad-normales" first="40" step="10" last="100"/>
+    <steppedValueSet variable="vision" first="5" step="1" last="15"/>
+    <steppedValueSet variable="max-ammo" first="7" step="2" last="15"/>
+    <steppedValueSet variable="human-speed" first="7" step="2" last="15"/>
+    <steppedValueSet variable="densidad-medkits" first="5" step="2" last="15"/>
+    <steppedValueSet variable="prob-reproduccion" first="1" step="1" last="5"/>
+  </experiment>
+</experiments>
 @#$#@#$#@
 @#$#@#$#@
 default
