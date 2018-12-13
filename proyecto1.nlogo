@@ -325,7 +325,7 @@ to balabehavior
       if (any? turtles-here with [breed = normales]) [
         if any? turtles-here with [breed = normales and wounded = true][
         ask one-of normales-here with [wounded = true][
-          show "hola"
+
           kill
         ]
         ]
@@ -333,7 +333,7 @@ to balabehavior
         ask one-of turtles-here with [breed = normales]
           [
             set wounded true
-            show wounded
+
             ask myself [die]
         ]
         ]
@@ -530,7 +530,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-0.0
+77.0
 1
 1
 NIL
@@ -556,7 +556,7 @@ densidad-balas
 densidad-balas
 0
 100
-0.0
+30.0
 1
 1
 NIL
@@ -601,7 +601,7 @@ cantidad-hostiles
 cantidad-hostiles
 0
 100
-0.0
+26.0
 1
 1
 NIL
@@ -627,7 +627,7 @@ densidad-medkits
 densidad-medkits
 0
 100
-27.0
+18.0
 1
 1
 NIL
