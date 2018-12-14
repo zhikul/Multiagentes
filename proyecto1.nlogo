@@ -89,6 +89,7 @@ to setup-items
 
 end
 to go
+  ifelse (count zombies + count hostiles > 0) and (count zombies + count normales > 0) and (count normales + count hostiles > 0)[
   ask normales [
 
     normalbehavior
@@ -100,6 +101,8 @@ to go
   ask zombies [zombiebehavior]
   ifelse (showlinks? != true) [ ask links [hide-link] ][ ask links [show-link] ]
   tick
+  ]
+  [stop]
 end
 to-report avarege-normales-heading
   let x-component sum [dx] of compas
@@ -382,7 +385,8 @@ to reproduce
         set energia energia - 50
         hatch 1 [
           set energia max-energia + random 100
-          rt random-float 360 fd 1
+          rt random-float 360
+          fd 0.5
           set municion 0
           if breed = normales [set wounded false]
           set compas no-turtles
@@ -515,7 +519,7 @@ zombie-speed
 zombie-speed
 0
 100
-15.0
+20.0
 1
 1
 NIL
@@ -601,7 +605,7 @@ cantidad-hostiles
 cantidad-hostiles
 0
 100
-50.0
+40.0
 1
 1
 NIL
@@ -677,6 +681,26 @@ max-energia
 1
 NIL
 HORIZONTAL
+
+PLOT
+28
+421
+228
+571
+plot 1
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -13345367 true "" "plot count normales"
+"pen-1" 1.0 0 -2674135 true "" "plot count zombies"
+"pen-2" 1.0 0 -16777216 true "" "plot count hostiles"
 
 @#$#@#$#@
 ## WHAT IS IT?
