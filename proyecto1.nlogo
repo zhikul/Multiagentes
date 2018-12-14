@@ -485,7 +485,7 @@ human-speed
 human-speed
 1
 100
-10.0
+15.0
 1
 1
 NIL
@@ -530,7 +530,7 @@ cantidad-zombies
 cantidad-zombies
 0
 100
-50.0
+75.0
 1
 1
 NIL
@@ -556,7 +556,7 @@ densidad-balas
 densidad-balas
 0
 100
-10.0
+20.0
 1
 1
 NIL
@@ -586,7 +586,7 @@ reloa
 reloa
 0
 100
-5.0
+10.0
 1
 1
 NIL
@@ -601,7 +601,7 @@ cantidad-hostiles
 cantidad-hostiles
 0
 100
-20.0
+50.0
 1
 1
 NIL
@@ -627,7 +627,7 @@ densidad-medkits
 densidad-medkits
 0
 100
-5.0
+15.0
 1
 1
 NIL
@@ -642,7 +642,7 @@ max-ammo
 max-ammo
 0
 100
-7.0
+15.0
 1
 1
 NIL
@@ -672,7 +672,7 @@ max-energia
 max-energia
 200
 500
-300.0
+400.0
 1
 1
 NIL
@@ -1025,10 +1025,10 @@ NetLogo 6.0.4
 @#$#@#$#@
 @#$#@#$#@
 <experiments>
-  <experiment name="experiment-zombies" repetitions="2" runMetricsEveryStep="false">
+  <experiment name="experiment-zombies" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="10000"/>
+    <timeLimit steps="5000"/>
     <exitCondition>(count zombies + count hostiles = 0) or (count zombies + count normales = 0) or (count normales + count hostiles = 0)</exitCondition>
     <metric>count normales</metric>
     <metric>count hostiles</metric>
@@ -1036,7 +1036,6 @@ NetLogo 6.0.4
     <enumeratedValueSet variable="max-energia">
       <value value="300"/>
       <value value="400"/>
-      <value value="500"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="densidad-balas">
       <value value="10"/>
@@ -1044,9 +1043,8 @@ NetLogo 6.0.4
       <value value="30"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="cantidad-hostiles">
-      <value value="20"/>
-      <value value="40"/>
-      <value value="60"/>
+      <value value="30"/>
+      <value value="50"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="cantidad-zombies">
       <value value="50"/>
@@ -1068,7 +1066,6 @@ NetLogo 6.0.4
       <value value="100"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="vision">
-      <value value="5"/>
       <value value="10"/>
     </enumeratedValueSet>
     <enumeratedValueSet variable="max-ammo">
